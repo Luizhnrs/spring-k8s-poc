@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: brluiz-poc-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: brluiz-poc-template
+
+  template:
+    metadata:
+      labels:
+        app: brluiz-poc-template
+
+    spec:
+      containers:
+        - name: brluiz-poc-container
+
+          image: brluizpoc:v1
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 8080

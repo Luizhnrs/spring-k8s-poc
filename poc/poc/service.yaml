@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: brluiz-poc-service
+
+spec:
+  type: LoadBalancer
+
+  selector:
+    app: brluiz-poc
+
+  ports:
+    - port: 80
+      targetPort: 8080
