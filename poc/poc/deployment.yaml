@@ -8,12 +8,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: brluiz-poc-template
+      app: brluiz-poc
 
   template:
     metadata:
       labels:
-        app: brluiz-poc-template
+        app: brluiz-poc
 
     spec:
       containers:

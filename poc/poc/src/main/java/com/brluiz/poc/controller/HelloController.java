@@ -12,4 +12,10 @@ public class HelloController {
     public String hello() {
         return "hello world";
     }
+
+   @GetMapping("/pod")
+    public String getPodName() {
+        String podName = System.getenv("HOSTNAME");
+        return podName != null ? podName : "brluiz-poc-deployment-6c79d6f84c";
+    }
 }
