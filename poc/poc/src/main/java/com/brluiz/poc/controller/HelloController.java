@@ -16,6 +16,6 @@ public class HelloController {
    @GetMapping("/pod")
     public String getPodName() {
         String podName = System.getenv("HOSTNAME");
-        return podName != null ? podName : "brluiz-poc-deployment-6c79d6f84c";
+        return podName != null ? podName : System.getenv("KUBECTL_PODS");
     }
 }
