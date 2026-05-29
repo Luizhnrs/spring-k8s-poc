@@ -6,6 +6,7 @@ import com.brluiz.poc.dto.TokenDTO;
 import com.brluiz.poc.entity.User;
 import com.brluiz.poc.repository.UserRepository;
 import com.brluiz.poc.security.JwtUtil;
+import com.brluiz.poc.service.TicketServiceClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,13 +25,16 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TicketServiceClient ticketServiceClient;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
-                        UserRepository userRepository, PasswordEncoder passwordEncoder) {
+                        UserRepository userRepository, PasswordEncoder passwordEncoder,
+                        TicketServiceClient ticketServiceClient) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.ticketServiceClient = ticketServiceClient;
     }
 
     @PostMapping("/login")
@@ -45,6 +49,8 @@ public class AuthController {
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String token = jwtUtil.generateToken(userDetails);
+
+            ticketServiceClient.incrementTicket("AUDITORIA");
 
             return ResponseEntity.ok(new TokenDTO(token, "Bearer"));
         } catch (AuthenticationException e) {
@@ -76,6 +82,8 @@ public class AuthController {
             );
 
             userRepository.save(newUser);
+
+            ticketServiceClient.incrementTicket("NOTIFICACAO");
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Usuário cadastrado com sucesso");
