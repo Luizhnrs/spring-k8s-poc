@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-service
+  labels:
+    app: tickets-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tickets-service
+  template:
+    metadata:
+      labels:
+        app: tickets-service
+    spec:
+      containers:
+        - name: tickets-service
+          image: tickets-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://tickets-postgres-service:5432/ticketsdb"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "ticketsuser"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "ticketspassword"
+            - name: APP_SNS_TOPIC_ARN
+              value: "arn:aws:sns:us-east-1:123456789012:ticket-events"
+            - name: APP_SNS_REGION
+              value: "us-east-1"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
