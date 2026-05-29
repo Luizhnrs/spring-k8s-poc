@@ -1,4 +1,4 @@
-﻿# KubeCTL-Test
+﻿# spring-k8s-poc
 
 Monorepo de microsserviços Java com autenticação JWT, analytics de tickets e notificações por email. Deploy em Kubernetes (Kind) ou Docker Compose.
 
