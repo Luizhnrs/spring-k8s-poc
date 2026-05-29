@@ -5,6 +5,7 @@ com\brluiz\poc\dto\RegisterDTO.class
 com\brluiz\poc\controller\TicketConsumerController.class
 com\brluiz\poc\security\JwtUtil.class
 com\brluiz\poc\dto\LoginDTO.class
+com\brluiz\poc\service\NotificationServiceClient.class
 com\brluiz\poc\entity\User.class
 com\brluiz\poc\config\RestTemplateConfig.class
 com\brluiz\poc\dto\TokenDTO.class

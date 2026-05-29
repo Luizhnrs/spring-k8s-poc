@@ -1,2 +1,3 @@
-com\brluiz\notification\listener\SnsEmailListener.class
 com\brluiz\notification\NotificationServiceApplication.class
+com\brluiz\notification\controller\NotificationController.class
+com\brluiz\notification\listener\SnsEmailListener.class
