@@ -9,8 +9,8 @@ Monorepo de microsserviços Java com autenticação JWT, analytics de tickets e 
 | Serviço | Porta | Tecnologia | Descrição |
 |---------|-------|------------|-----------|
 | **POC** | `8080` | Spring Boot 4.0.6 | Autenticação JWT + Proxy para Tickets/Notificações |
-| **Tickets Service** | `8081` | Spring Boot 3.4.4 | Analytics de tickets (contadores por evento) |
-| **Notification Service** | `8082` | Spring Boot 3.4.4 | Notificações por email |
+| **Tickets Service** | `8081` | Spring Boot 4.0.6 | Analytics de tickets (contadores por evento) |
+| **Notification Service** | `8082` | Spring Boot 4.0.6 | Notificações por email |
 
 ---
 
