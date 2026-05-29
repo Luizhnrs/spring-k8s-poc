@@ -1,0 +1,155 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Maven Start Up Batch script
+#
+# Required ENV vars:
+# JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# M2_HOME - location of maven2's installed home dir
+# MAVEN_BATCH_ECHO - set to 'on' to enable the echoing of the batch commands
+# MAVEN_BATCH_PAUSE - set to 'on' to wait for a key stroke before ending
+# MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+# set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+# MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+# ----------------------------------------------------------------------------
+
+if [ -z "$MAVEN_SKIP_RC" ] ; then
+
+  if [ -f /usr/local/etc/mavenrc ] ; then
+    . /usr/local/etc/mavenrc
+  fi
+
+  if [ -f /etc/mavenrc ] ; then
+    . /etc/mavenrc
+  fi
+
+  if [ -f "$HOME/.mavenrc" ] ; then
+    . "$HOME/.mavenrc"
+  fi
+
+fi
+
+# OS specific support
+cygwin=false;
+darwin=false;
+mingw=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  MINGW*) mingw=true;;
+  Darwin*) darwin=true
+           #
+           # See https://github.com/nickl-/maven-wrapper/issues/2
+           #
+           # MacPorts and Homebrew install GNU grep into /opt/local/bin:/opt/homebrew/bin
+           #
+           if [ -f /opt/local/bin/grep ] ; then
+             GREP_OPTS="-b"
+           else
+             if [ -f /opt/homebrew/bin/grep ] ; then
+               GREP_OPTS="-b"
+             else
+               GREP_OPTS=""
+             fi
+           fi
+           ;;
+esac
+
+if $cygwin ; then
+    CLASSPATH_SEPARATOR=";"
+else
+    CLASSPATH_SEPARATOR=":"
+fi
+
+# For Cygwin, ensure paths are in UNIX format before anything is touched
+if $cygwin ; then
+    [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+fi
+
+if $mingw ; then
+    CLASSPATH_SEPARATOR=";"
+fi
+
+# Gather all the maven wrapper properties
+. "$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.properties"
+
+# Use the maven wrapper jar if it exists
+WRAPPER_JAR="$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.jar"
+if [ -f "$WRAPPER_JAR" ] ; then
+  echo "Found Maven wrapper jar at $WRAPPER_JAR"
+else
+  echo "Could not find Maven wrapper jar at $WRAPPER_JAR, downloading it ..."
+  if [ -n "$MVNW_REPOURL" ] ; then
+    downloadUrl="$MVNW_REPOURL/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+  else
+    downloadUrl="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+  fi
+  curl -sS -o "$WRAPPER_JAR" "$downloadUrl"
+fi
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+        JAVACMD="$JAVA_HOME/jre/sh/java"
+    else
+        JAVACMD="$JAVA_HOME/bin/java"
+    fi
+    if [ ! -x "$JAVACMD" ] ; then
+        echo "Error: JAVA_HOME is set to an invalid directory: $JAVA_HOME" >&2
+        echo "Please set the JAVA_HOME variable in your environment to match the" >&2
+        echo "location of your Java installation." >&2
+        exit 1
+    fi
+else
+    JAVACMD="java"
+    which java >/dev/null 2>&1 || echo "Error: JAVA_HOME is not set and no 'java' command could be found in your PATH." >&2
+fi
+
+# Increase the maximum file descriptors if we can.
+if [ "$darwin" = "false" -o "$cygwin" = "false" -o "$mingw" = "false" ] ; then
+    MAX_FD_LIMIT=`ulimit -H -n`
+    if [ $? -eq 0 ] ; then
+        if [ "$MAX_FD" = "maximum" -o "$MAX_FD" = "max" ] ; then
+            MAX_FD="$MAX_FD_LIMIT"
+        fi
+        ulimit -n $MAX_FD
+        if [ $? -ne 0 ] ; then
+            echo "Could not set maximum file descriptor limit: $MAX_FD"
+        fi
+    else
+        echo "Could not query maximum file descriptor limit: $MAX_FD_LIMIT"
+    fi
+fi
+
+# Gradle/Java arguments
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+# Collect all arguments for the java command;
+#   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $MAVEN_OPTS can contain fragments of
+#     shell script including quotes and/or backslashes, so put them in
+#     temporary variables and expand them as late as possible.
+set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $MAVEN_OPTS $MAVEN_DEBUG_OPTS
+JAVA_OPTS="$*"
+
+# Prepare the project classpath and invoke Maven
+exec "$JAVACMD" $JAVA_OPTS -classpath "$WRAPPER_JAR" "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" $WRAPPER_LAUNCHER "$@"
