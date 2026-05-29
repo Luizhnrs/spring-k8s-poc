@@ -1,0 +1,8 @@
+com\brluiz\tickets\service\TicketService.class
+com\brluiz\tickets\controller\TicketController.class
+com\brluiz\tickets\entity\Ticket.class
+com\brluiz\tickets\repository\TicketRepository.class
+com\brluiz\tickets\listener\SnsTicketListener.class
+com\brluiz\tickets\enums\TicketType.class
+com\brluiz\tickets\TicketServiceApplication.class
+com\brluiz\tickets\entity\Ticket$TicketBuilder.class

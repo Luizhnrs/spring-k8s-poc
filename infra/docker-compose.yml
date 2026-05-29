@@ -1,0 +1,104 @@
+version: '3.8'
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+
+  # ----- POC PostgreSQL -----
+  poc-postgres:
+    image: postgres:15-alpine
+    container_name: poc-postgres
+    environment:
+      POSTGRES_DB: pocdb
+      POSTGRES_USER: pocuser
+      POSTGRES_PASSWORD: pocpassword
+    ports:
+      - "5433:5432"
+    volumes:
+      - poc-postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pocuser -d pocdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----- Tickets PostgreSQL -----
+  tickets-postgres:
+    image: postgres:15-alpine
+    container_name: tickets-postgres
+    environment:
+      POSTGRES_DB: ticketsdb
+      POSTGRES_USER: ticketsuser
+      POSTGRES_PASSWORD: ticketspassword
+    ports:
+      - "5434:5432"
+    volumes:
+      - tickets-postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticketsuser -d ticketsdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----- Tickets Service -----
+  tickets-service:
+    build:
+      context: ../apps/tickets-service
+      dockerfile: Dockerfile
+    container_name: tickets-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://tickets-postgres:5432/ticketsdb
+      SPRING_DATASOURCE_USERNAME: ticketsuser
+      SPRING_DATASOURCE_PASSWORD: ticketspassword
+      APP_SNS_ENABLED: "false"
+    networks:
+      - app-network
+    depends_on:
+      tickets-postgres:
+        condition: service_healthy
+
+  # ----- POC Application -----
+  poc-app:
+    build:
+      context: ../apps/poc
+      dockerfile: Dockerfile
+    container_name: poc-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://poc-postgres:5432/pocdb
+      SPRING_DATASOURCE_USERNAME: pocuser
+      SPRING_DATASOURCE_PASSWORD: pocpassword
+      TICKETS_SERVICE_URL: http://tickets-service:8081
+    networks:
+      - app-network
+    depends_on:
+      poc-postgres:
+        condition: service_healthy
+      tickets-service:
+        condition: service_started
+
+  # ----- Notification Service -----
+  notification-service:
+    build:
+      context: ../apps/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8082:8082"
+    environment:
+      APP_SNS_ENABLED: "false"
+    networks:
+      - app-network
+
+volumes:
+  poc-postgres-data:
+  tickets-postgres-data:

@@ -1,0 +1,16 @@
+com\brluiz\poc\security\SecurityConfig.class
+com\brluiz\poc\entity\User$Role.class
+com\brluiz\poc\security\JwtAuthenticationFilter.class
+com\brluiz\poc\dto\RegisterDTO.class
+com\brluiz\poc\controller\TicketConsumerController.class
+com\brluiz\poc\security\JwtUtil.class
+com\brluiz\poc\dto\LoginDTO.class
+com\brluiz\poc\entity\User.class
+com\brluiz\poc\config\RestTemplateConfig.class
+com\brluiz\poc\dto\TokenDTO.class
+com\brluiz\poc\controller\AuthController.class
+com\brluiz\poc\service\TicketServiceClient.class
+com\brluiz\poc\repository\UserRepository.class
+com\brluiz\poc\service\CustomUserDetailsService.class
+com\brluiz\poc\controller\HelloController.class
+com\brluiz\poc\PocApplication.class

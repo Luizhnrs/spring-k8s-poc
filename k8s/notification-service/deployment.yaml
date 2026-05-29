@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels:
+    app: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: notification-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          env:
+            - name: APP_SNS_ENABLED
+              value: "false"
+            - name: APP_SNS_TOPIC_ARN
+              value: "arn:aws:sns:us-east-1:000000000000:email-notification"
+            - name: APP_SNS_REGION
+              value: "us-east-1"
+            - name: APP_SNS_QUEUE_URL
+              value: "https://localhost.localstack.cloud:4566/000000000000/email-notification-queue"
+            - name: APP_SNS_QUEUE_NAME
+              value: "email-notification-queue"
+            - name: APP_SNS_LOCALSTACK_ENDPOINT
+              value: "https://localhost.localstack.cloud:4566"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
