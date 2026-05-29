@@ -6,6 +6,7 @@ import com.brluiz.poc.dto.TokenDTO;
 import com.brluiz.poc.entity.User;
 import com.brluiz.poc.repository.UserRepository;
 import com.brluiz.poc.security.JwtUtil;
+import com.brluiz.poc.service.NotificationServiceClient;
 import com.brluiz.poc.service.TicketServiceClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +27,18 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TicketServiceClient ticketServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
                         UserRepository userRepository, PasswordEncoder passwordEncoder,
-                        TicketServiceClient ticketServiceClient) {
+                        TicketServiceClient ticketServiceClient,
+                        NotificationServiceClient notificationServiceClient) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.ticketServiceClient = ticketServiceClient;
+        this.notificationServiceClient = notificationServiceClient;
     }
 
     @PostMapping("/login")
@@ -84,6 +88,7 @@ public class AuthController {
             userRepository.save(newUser);
 
             ticketServiceClient.incrementTicket("NOTIFICACAO");
+            notificationServiceClient.sendWelcomeEmail(registerDTO.getEmail(), registerDTO.getUsername());
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Usuário cadastrado com sucesso");
