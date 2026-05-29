@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.SubscribeRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -36,40 +39,51 @@ public class SnsTicketListener {
     @Value("${app.sns.region:us-east-1}")
     private String region;
 
-    @Value("${app.sns.queue-name:ticket-events-queue}")
-    private String queueName;
+    @Value("${app.sns.queue-url}")
+    private String queueUrl;
+
+    @Value("${app.sns.localstack-endpoint}")
+    private String localstackEndpoint;
 
     private SqsClient sqsClient;
     private SnsClient snsClient;
-    private String queueUrl;
     private ExecutorService executor;
     private volatile boolean running = true;
 
     @PostConstruct
     public void init() {
         try {
-            URI endpoint = URI.create("http://localhost:4566"); // LocalStack default
+            URI endpoint = URI.create(localstackEndpoint);
+            var credentials = StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create("test", "test"));
+
             sqsClient = SqsClient.builder()
                     .endpointOverride(endpoint)
-                    .region(software.amazon.awssdk.regions.Region.of(region))
+                    .region(Region.of(region))
+                    .credentialsProvider(credentials)
                     .build();
             snsClient = SnsClient.builder()
                     .endpointOverride(endpoint)
-                    .region(software.amazon.awssdk.regions.Region.of(region))
+                    .region(Region.of(region))
+                    .credentialsProvider(credentials)
                     .build();
 
-            // Create queue if not exists
-            try {
-                CreateQueueResponse createQueue = sqsClient.createQueue(
-                        CreateQueueRequest.builder().queueName(queueName).build());
-                queueUrl = createQueue.queueUrl();
-            } catch (QueueNameExistsException e) {
-                GetQueueUrlResponse getQueueUrl = sqsClient.getQueueUrl(
-                        GetQueueUrlRequest.builder().queueName(queueName).build());
-                queueUrl = getQueueUrl.queueUrl();
-            }
+            // Subscribe the existing SQS queue to the SNS topic
+            subscribeQueueToTopic();
 
-            // Subscribe SQS queue to SNS topic
+            log.info("Listener initialized. Queue: {} | Topic: {}", queueUrl, topicArn);
+
+            // Start polling in background
+            executor = Executors.newSingleThreadExecutor();
+            executor.submit(this::pollMessages);
+
+        } catch (Exception e) {
+            log.error("SNS/SQS initialization failed: {}", e.getMessage(), e);
+        }
+    }
+
+    private void subscribeQueueToTopic() {
+        try {
             String queueArn = sqsClient.getQueueAttributes(
                     GetQueueAttributesRequest.builder()
                             .queueUrl(queueUrl)
@@ -83,14 +97,9 @@ public class SnsTicketListener {
                     .endpoint(queueArn)
                     .build());
 
-            log.info("SQS queue '{}' subscribed to SNS topic '{}'", queueName, topicArn);
-
-            // Start polling in background
-            executor = Executors.newSingleThreadExecutor();
-            executor.submit(this::pollMessages);
-
+            log.info("Queue subscribed to SNS topic. Queue ARN: {}", queueArn);
         } catch (Exception e) {
-            log.warn("SNS/SQS initialization failed. Running without event listener: {}", e.getMessage());
+            log.warn("Could not subscribe queue to topic (may already be subscribed): {}", e.getMessage());
         }
     }
 
